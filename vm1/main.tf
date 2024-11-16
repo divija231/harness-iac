@@ -11,7 +11,7 @@ provider "google" {
   project     = "dev-bivouac-441702-t4"
   region      = "us-central1"
   zone        = "us-central1-c"
-  credentials = file("/harness/gcp_credentials.json")
+  credentials = file("gcp_credentials.json")
 }
 
 resource "google_compute_instance" "default" {
