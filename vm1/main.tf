@@ -1,15 +1,23 @@
-resource "google_service_account" "default" {
-  account_id   = "48954735909-compute@developer.gserviceaccount.com"
-  display_name = "Custom SA for VM Instance"
-  credentials = file("./app.json")
-  project = "dev-bivouac-441702-t4"
-  region = "us-central1"
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "6.11.2"
+    }
+  }
+}
+
+provider "google" {
+  project     = "dev-bivouac-441702-t4"
+  region      = "us-central1"
+  zone        = "us-central1-c"
+  credentials = file("${path.module}/gcp_credentials.json")
 }
 
 resource "google_compute_instance" "default" {
-  name         = "my-instance-harness"
-  machine_type = "n2-standard-2"
-  zone         = "us-central1-a"
+  name         = "my-instance-from-harness"
+  machine_type = "e2-medium"
+  zone         = "us-central1-c"
 
   tags = ["foo", "bar"]
 
@@ -22,17 +30,9 @@ resource "google_compute_instance" "default" {
     }
   }
 
-  // Local SSD disk
-  scratch_disk {
-    interface = "NVME"
-  }
-
   network_interface {
     network = "default"
-
-    access_config {
-      // Ephemeral public IP
-    }
+    access_config {}
   }
 
   metadata = {
@@ -42,8 +42,7 @@ resource "google_compute_instance" "default" {
   metadata_startup_script = "echo hi > /test.txt"
 
   service_account {
-    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
-    email  = google_service_account.default.email
-    scopes = ["cloud-platform"]
+    email  = "admin-created@dev-bivouac-441702-t4.iam.gserviceaccount.com"  # Replace with your service account email
+    scopes = ["https://www.googleapis.com/auth/cloud-platform"]
   }
 }
