@@ -28,12 +28,13 @@ pipeline:
                     shell: Sh
                     command: |-
                       #!/bin/bash
-                      apk update && apk add curl
-                      apk add jq
+
+                      apt-get update && apt-get install curl
+                      apt-get install jq
                       # Variables
                       AWX_HOST="http://34.45.224.205:32556"    # Replace with your AWX server's URL or IP
                       API_TOKEN="XNnAeBgeAyBAVREWg59EqXo5LCcylZ"  # Replace with your API token
-                      TEMPLATE_ID=14                              # Replace with your job template ID
+                      TEMPLATE_ID=14                         # Replace with your job template ID
                       EXTRA_VARS='{"var1": "value1", "var2": "value2"}'  # Replace with your job's extra variables
 
                       # Trigger Job Template
@@ -68,17 +69,6 @@ pipeline:
                       else
                         echo "Failed to trigger job. Response: $response"
                       fi
-
-                      # function awx()
-                      # {
-
-                      # cat > payload.json <<EOF
-                      # {
-                      #     "limit": "$4","extra_vars": "{\"packer_vm_ip\": \"$4\"}"
-                      # }
-                      # EOF
-                      # cat payload.json
-                      # }
               - step:
                   type: IACMTerraformPlugin
                   name: init
