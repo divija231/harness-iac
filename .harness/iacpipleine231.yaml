@@ -100,13 +100,6 @@ pipeline:
                   spec:
                     command: plan
               - step:
-                  type: IACMApproval
-                  name: IACMApproval_1
-                  identifier: IACMApproval_1
-                  spec:
-                    autoApprove: false
-                  timeout: 1h
-              - step:
                   type: IACMTerraformPlugin
                   name: apply
                   identifier: apply
