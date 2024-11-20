@@ -25,8 +25,8 @@ pipeline:
                   name: Deploy-packages-to-vm
                   identifier: Deploypackagestovm
                   spec:
-                    connectorRef: dockerrregistery
-                    image: nginx-httpd
+                    connectorRef: dockerconnector
+                    image: new
                     shell: Sh
                     command: |-
                       #!/bin/bash
