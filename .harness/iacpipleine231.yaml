@@ -41,4 +41,63 @@ pipeline:
                   timeout: 10m
                   spec:
                     command: apply
+              - step:
+                  type: Run
+                  name: Deploy-packages-to-vm
+                  identifier: Deploypackagestovm
+                  spec:
+                    shell: Sh
+                    command: |-
+                      #!/bin/bash
+                      apk update && apk add curl
+                      apk add jq
+                      # Variables
+                      AWX_HOST="http://34.45.224.205:32556"    # Replace with your AWX server's URL or IP
+                      API_TOKEN="XNnAeBgeAyBAVREWg59EqXo5LCcylZ"  # Replace with your API token
+                      TEMPLATE_ID=14                              # Replace with your job template ID
+                      EXTRA_VARS='{"var1": "value1", "var2": "value2"}'  # Replace with your job's extra variables
+
+                      # Trigger Job Template
+                      response=$(curl -s -X POST "$AWX_HOST/api/v2/job_templates/$TEMPLATE_ID/launch/" \
+                        -H "Authorization: Bearer $API_TOKEN" \
+                        -H "Content-Type: application/json" \
+                        -d "$EXTRA_VARS")
+
+                      # Extract Job ID
+                      job_id=$(echo $response | jq -r '.id')
+
+                      if [ "$job_id" != "null" ]; then
+                        echo "Job triggered successfully! Job ID: $job_id"
+                        
+                        # Monitor Job Status
+                        while true; do
+                          job_status=$(curl -s -X GET "$AWX_HOST/api/v2/jobs/$job_id/" \
+                            -H "Authorization: Bearer $API_TOKEN" \
+                            | jq -r '.status')
+
+                          echo "Job Status: $job_status"
+                          if [[ "$job_status" == "successful" ]]; then
+                            echo "Job completed successfully!"
+                            break
+                          elif [[ "$job_status" == "failed" ]]; then
+                            echo "Job failed. Check logs in AWX."
+                            break
+                          fi
+
+                          sleep 5  # Wait before checking again
+                        done
+                      else
+                        echo "Failed to trigger job. Response: $response"
+                      fi
+
+                      # function awx()
+                      # {
+
+                      # cat > payload.json <<EOF
+                      # {
+                      #     "limit": "$4","extra_vars": "{\"packer_vm_ip\": \"$4\"}"
+                      # }
+                      # EOF
+                      # cat payload.json
+                      # }
         tags: {}
