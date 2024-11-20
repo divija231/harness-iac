@@ -25,11 +25,11 @@ pipeline:
                   name: awx
                   identifier: awx
                   spec:
-                    shell: Sh
+                    shell: Bash
                     command: |-
                       #!/bin/bash
                       set -e 
-
+                      sudo apt-get update
                       apt-get update && apt-get install curl
                       apt-get install jq
                       # Variables
