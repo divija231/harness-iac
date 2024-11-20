@@ -6,7 +6,28 @@ pipeline:
   tags: {}
   stages:
     - stage:
-        name: build
+        name: artifacts
+        identifier: artifacts
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: jfrog
+                  identifier: jfrog
+                  spec:
+                    shell: Sh
+    - stage:
+        name: awx
         identifier: build
         description: ""
         type: CI
@@ -70,6 +91,11 @@ pipeline:
                       else
                         echo "Failed to trigger job. Response: $response"
                       fi
+          caching:
+            enabled: false
+            paths: []
+          buildIntelligence:
+            enabled: false
     - stage:
         name: vm create
         identifier: vm_create
