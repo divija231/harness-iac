@@ -6,27 +6,25 @@ pipeline:
   tags: {}
   stages:
     - stage:
-        name: vm create
-        identifier: vm_create
+        name: build
+        identifier: build
         description: ""
-        type: IACM
+        type: CI
         spec:
+          cloneCodebase: true
           platform:
             os: Linux
             arch: Amd64
           runtime:
             type: Cloud
             spec: {}
-          workspace: workspace231
           execution:
             steps:
               - step:
                   type: Run
-                  name: Deploy-packages-to-vm
-                  identifier: Deploypackagestovm
+                  name: awx
+                  identifier: awx
                   spec:
-                    connectorRef: dockerconnector
-                    image: alpine
                     shell: Sh
                     command: |-
                       #!/bin/bash
@@ -72,6 +70,21 @@ pipeline:
                       else
                         echo "Failed to trigger job. Response: $response"
                       fi
+    - stage:
+        name: vm create
+        identifier: vm_create
+        description: ""
+        type: IACM
+        spec:
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          workspace: workspace231
+          execution:
+            steps:
               - step:
                   type: IACMTerraformPlugin
                   name: init
@@ -101,3 +114,8 @@ pipeline:
                   spec:
                     command: apply
         tags: {}
+  properties:
+    ci:
+      codebase:
+        repoName: harnessrepo
+        build: <+input>
