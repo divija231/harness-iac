@@ -25,9 +25,12 @@ pipeline:
                   name: Deploy-packages-to-vm
                   identifier: Deploypackagestovm
                   spec:
+                    connectorRef: dockerrregistery
+                    image: nginx-httpd
                     shell: Sh
                     command: |-
                       #!/bin/bash
+                      set -e 
 
                       apt-get update && apt-get install curl
                       apt-get install jq
